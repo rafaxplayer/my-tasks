@@ -1,0 +1,61 @@
+.App{
+    
+}
+
+.App-logo {
+    animation: App-logo-trans 1.5s ease;
+    height: 80px;
+    position: relative;
+    
+}
+
+.App-header {
+    text-align: center;
+    background-color: #1c1e22;
+    padding: 20px;
+    color: white;
+}
+
+.container {
+    margin-top: 20px;
+}
+.container form button{
+    margin:0 10px 20px 0;
+}
+
+.App-container>input,
+.App-container>textarea {
+    margin-bottom: 20px;
+    display: block;
+    width: 100%;
+}
+.panel-danger>.panel-heading{
+    background-color: #c10b0b !important;
+}
+
+@keyframes App-logo-trans {
+    0% {
+        opacity:0;
+        transform:translateX(-200px);
+    }
+    80%{
+        
+        transform:translateX(20px) rotate(10deg);
+    }
+    90%{
+        transform:translateX(-20px);
+    }
+    100%{
+        opacity:1;
+        transform:translateX(0px);
+    }
+    
+}
+@keyframes App-logo-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
