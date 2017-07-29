@@ -1,0 +1,124 @@
+.App-logo {
+    
+    position: relative;
+    cursor: pointer;
+    
+}
+.App-logo,.App-header h1{
+    animation: App-logo-scale 1s ease;
+}
+.App-header {
+    text-align: center;
+    background-color: #1c1e22;
+    padding: 40px;
+    color: white;
+    position: relative;
+    border-bottom: 1px #6b6262 solid
+}
+.App-header-nav{
+    background: black;
+    text-align: right;
+    position: absolute;
+    top:0;
+    left: 0;
+    right: 0;
+    padding: 0px 5px;
+    -webkit-transition: all .8s ease;
+    -moz-transition: all .8s ease;
+    transition: all .8s ease;
+
+}
+
+.App-header-nav .button-nav{
+    border:2px solid #989393;
+    border-radius: 10px;
+    padding: 4px;
+    cursor: pointer;
+    color:#989393;
+    margin: 10px 0 0 5px;
+    display: none;
+}
+
+.App-header-nav ul{
+    list-style: none;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    background: black;
+    
+}
+.App-header-nav ul>li{
+    
+    display: inline-block;
+    padding: 8px 12px;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-transition: all .4s ease;
+    -moz-transition: all .4s ease;
+    transition: all .4s ease;
+}
+
+.App-header-nav ul>li:hover{
+    background: #333;
+}
+.App-header h1{
+    position: relative;
+    z-index: 99999;
+    
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
+    
+}
+.App-header .add{
+    animation: movey .8s ease-in-out;
+    color: red;
+    position: absolute;
+    top: 82%;
+    width:80px;
+    height: 80px;
+    padding-top: 40px;
+    font-size: 1.8em;
+    background-color: inherit;
+    box-shadow: 1px solid #6b6262;
+    border-radius: 50%;
+    left: 50%;
+    cursor: pointer;
+    -webkit-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    transform: translateX(-50%);
+    transition:all .4s ease;
+    -webkit-box-shadow: 0px 3px 2px -1px rgba(107, 104, 104, 0.75);
+    -moz-box-shadow: 0px 3px 2px -1px rgba(107, 104, 104, 0.75);
+    box-shadow: 0px 3px 2px -1px rgba(105, 104, 104, 0.75);
+    
+}
+
+.App-header .add:hover{
+    color:white;
+    
+
+}
+@media (max-width: 768px) {
+    .App-header-nav{
+        text-align: left;
+        height: 60px;
+        
+    }
+    .App-header-nav .button-nav{
+        display:inline-block;
+    }
+   .App-header-nav ul{
+       border-top: 1px solid #989393;
+       display:none;
+       opacity: .6;
+       position: absolute;
+       top:60px;
+       left:-5px;
+       width: 100%;
+        z-index: 999999;
+       margin: 0;
+       overflow: hidden;
+   } 
+  .App-header-nav ul>li{
+      display: block
+  }
+}

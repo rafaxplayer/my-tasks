@@ -1,131 +1,245 @@
-import React, { Component } from 'react';
-import logo from '../../Calender.png';
-import './App.css';
-import ListNotes from './ListNotes/ListNotes';
-import firebase from 'firebase';
-import ModalDialogs, { initialstate } from '../ModalDialogs/ModalDialog';
-import ButtonUp from '../ButtonUp/ButtonUp';
-import ScrollToTop  from 'react-scroll-up';
+import React, { Component } from 'react'
+import ReactDOM from 'react-dom'
+import './App.css'
+import 'react-notifications/lib/notifications.css'
+import ListTasks from './ListTasks/ListTasks'
+import Calendar from "./Calendar/Calendar.jsx"
+import firebase from 'firebase'
+import ModalDialogs, { initialDialogstate } from '../ModalDialogs/ModalDialog'
+import ButtonUp from '../ButtonUp/ButtonUp'
+import ScrollToTop  from 'react-scroll-up'
 import moment from 'moment';
-import DateTimePicker from 'react-datetimepicker-bootstrap';
+import Details from './Details/Details'
+import Header from './Header/Header'
+import FormTasks from './FormTasks/FormTasks'
+import _ from 'lodash'
+import { NotificationContainer, NotificationManager } from 'react-notifications'
+import CalendarIcon from '../CalendarIcon/CalendraIcon'
 import $ from 'jquery'
-/*'DD/MM/YYYY h:MM:ss'*/
+import scrollTo from 'jquery.scrollto'
+
 class App extends Component {
 
     state = {
         title: "",
         body: "",
         key: "",
+        avislabel:"",
         dateevent:null,
+        datenotify:null,
+        formishidde:true,
+        formIsValid:{title:false, body:false, date:true},
+        avismodify:{n:0,f:'m'},
         edit: false,
-        initialstate
+        datetimeOps:null,
+        showDetails:false,
+        task:null,
+        tasks:[],
+        renderCalendar:true,
+        initialDialogstate
     }
-    componentDidMount(){
-        window.addEventListener('scroll',console.log(window.scrollY));
+  
+    messagesRef = firebase.database().ref('/notas')
+    interval = null;
+    
+    componentWillMount(){
+               
+        firebase.database().ref('/notas').orderByChild('date_event').on('value',(snapshot)=>{
+            this.setState({tasks:snapshot.val()})
+        })
+       
+       
+        $(".dropdown-menu li a").on('click', (e) => {
+            e.preventDefault();
+            let selText = e.currentTarget.innerHTML;
+            this.setState({avislabel:selText})
+            if(this.state.dateevent){
+                    
+                this.setState({avismodify:{n:e.currentTarget.dataset.num,f:e.currentTarget.dataset.format}})
+                console.log(this.state.avismodify)
+            }else{
+                
+                NotificationManager.error('No has seleccionado ninguna fecha para el evento.', 'Error', 3000, null, false);
+                this.setState({avislabel:""})
+            }
+               
+        })
+
+        this.interval = setInterval(() => {
+            firebase.database().ref('/notas').once('value',(snapshot) => {
+                snapshot.forEach((snap) => {
+                    if(moment(moment()).isAfter(snap.val().date_notify)&& !snap.val().notify){
+                        NotificationManager.success(snap.val().body, snap.val().title, 0, null, false);
+                        firebase.database().ref('/notas').child(snap.key).update({notify:true})
+                    }
+                })
+            })
+        },1000)
+       
     }
 
     reset() {
-
-        this.setState({ title: "", body: "", key: "", dateevent:"", edit: false });
-        $('#datetimepicker').data("DateTimePicker").date(null)
+        this.setState({ title: "", body: "", key: "", dateevent:null, datenotify:null, edit:false, avismodify:{n:0,f:'m'}});
+        this.refs.FormComponent.clearDateTime();
     }
-
-    scrollToForm(){
-        this.refs.top.scrollIntoView({behavior:"smooth", block:"start" ,});
-    }
-
-    datePickerValue(date){
-        const date_moment=$('#datetimepicker').data("DateTimePicker").date();
-        this.setState({dateevent:date_moment})
-        console.log(date_moment)
-    }
-
-    onChange(e) {
-
-        if (e.target.name === 'title') {
-            this.setState({ title: e.target.value });
-        } else {
-            this.setState({ body: e.target.value });
+    
+    onChangeInputs(e) {
+        const data = this.state.formIsValid
+        if(e.target){
+            if (e.target.name === 'title') {
+                data.title =! _.isEmpty(e.target.value);
+                this.setState({ title: _.capitalize(e.target.value),data});
+                
+            } else if (e.target.name === 'body'){
+                data.body =! _.isEmpty(e.target.value);
+                this.setState({ body: _.capitalize(e.target.value),data});
+            }
         }
+        
     }
 
+    datePickerChange(e){
+        if(e.date){
+            const select_date = e.date;
+            const today = moment();
+    
+            if(select_date.isBefore(today,'second')){
+                NotificationManager.error('No puedes programar eventos en fechas anteriores a hoy.', 'Error', 3000, null, false);
+                this.setState({dateevent:null,datenotify:null,showcalendar:false})
+                return;
+            }
+            this.setState({dateevent:select_date,datenotify:select_date})
+        }
+        
+    }
+
+    showDetails(task){
+        this.setState({task:task,showDetails:true})
+    }
+   
     setedit(id, note) {
-
-        const data = {  title: note.title, body: note.body, key: id, dateevent:moment(note.date_event), edit: true }
-        $('#datetimepicker').data("DateTimePicker").date(moment(note.date_event))
+        const data = {  title: note.title, body: note.body, key: id, dateevent:moment(note.date_event),datenotify:moment(note.date_notify), edit: true }
         this.setState(data);
+        if(this.state.formishidde){
+            this.showForm();
+        }
+        this.scrollToForm();
+            
     }
-
+    renderCalendar(bool){
+        this.setState({renderCalendar:bool})
+    }
     closeDialog() {
-        this.setState(initialstate)
+        this.setState(initialDialogstate)
+    }
+    
+    closeDetails(){
+        this.setState({showDetails:false})
     }
     
     showDialog(show, title, body, time, cancelButton, onconfirm) {
-            this.setState({ showDialog: show, datadialog: { title: title, body: body, settimeout: 0, cancelButton: false, onConfirm: () => this.closeDialog() } })
+        this.setState({ showDialog: show, datadialog: { title: title, body: body, settimeout: 0, cancelButton: false, onConfirm: () => this.closeDialog() } })
     }
     
-    newNote(e) {
+    newTask(e) {
         e.preventDefault()
-
-        if (!this.state.title.length > 0) {
-            this.showDialog(true, 'Error', 'El titulo es necesario', 0, false, this.closeDialog.bind(this))
+        if (!this.state.dateevent){
+            NotificationManager.error('No se ha selecionado una fecha valida para el vento.', 'Error', 0, null, false);
             return;
         }
-        if (!this.state.body.length > 0) {
-            this.showDialog(true, 'Error', 'El mensage es requerido', 0, false, this.closeDialog.bind(this))
-            return;
+        
+        const data = { 
+            title: this.state.title, 
+            body: this.state.body, 
+            creation_date:moment().format(),
+            date_event: moment(this.state.dateevent).format(),
+            date_notify: this.state.key.length > 0 ? moment(this.state.datenotify).format():moment(this.state.datenotify).subtract(this.state.avismodify.n,this.state.avismodify.f).format(),
+            notify:false
         }
-        const messagesRef = firebase.database().ref('/notas')
-        const data = { title: this.state.title, body: this.state.body, date:moment.utc().format(),date_event:moment.utc(this.state.dateevent).format() }
+        
+        const tasksRef = firebase.database().ref('/notas')
+        const key = this.state.key.length > 0 ? this.state.key : tasksRef.push().key;
 
-        const key = this.state.key.length > 0 ? this.state.key : messagesRef.push().key;
-
-        messagesRef.child(key).update(data)
+        tasksRef.child(key).update(data)
             .then(() => {
                 let msg = this.state.key.length > 0 ? 'Nota actualizada con exito!' : 'Nota creada con exito!';
-
                 this.showDialog(true, 'Nota', msg, 5000, false, this.closeDialog.bind(this))
                 this.reset()
             }, (err) => alert(err));
     }
 
+    showForm(){
+        $('.container form').slideToggle(()=>{
+            this.setState({formishidde:$('.container form').is(':hidden')});
+        });
+
+        this.scrollToForm();
+    }
+
+    scrollToForm(){
+        $.scrollTo(ReactDOM.findDOMNode(this.formRef),{
+            duration:800,
+            offset:{left:0,top:-100}})
+             
+    }
+
+    showCalendar(){
+        this.setState({showcalendar:!this.state.showcalendar});
+    }
+
+    pruevas = (e) => {
+        e.preventDefault();
+        
+    }
+
+    componentWillUnmount() {
+        if(this.interval){clearInterval(this.interval)}
+    }
+
     render() {
-        return (<div ref="top" className = "App" >
-            <div className = "App-header" >
-                <div style={ {textAlign:'center',position:'relative'}}>
-                    <div className ="App-logo" style={{display:'inline-block',width:'80px',height:'80px'}}>
-                        <img src = { logo }  style={{width:'100%'}} alt="logo" />
-                    </div>
-                </div>
-                <h2> Welcome to My Tasks App </h2> </div> 
-                <div className = "container" >
-                <form ref="form">
-                    <div className = "form-group">
-                        <label htmlFor = "title" > Titulo </label> 
-                        <input className = "form-control" name = "title" id = "title"type = "text" onChange = { this.onChange.bind(this) } value = { this.state.title } autoComplete = "off"/>
-                    </div> 
-                    <div className = "form-group">
-                        <label htmlFor = "body"> Nota </label> 
-                        <textarea className = "form-control"name = "body" id = "body" onChange = { this.onChange.bind(this) } value = { this.state.body } autoComplete = "off"></textarea> 
-                    </div> 
-                    <label htmlFor = "datetimepicker"> Fecha del Evento</label> 
-                    <DateTimePicker id="datetimepicker" icon="right" getValue={this.datePickerValue.bind(this)} defaultDate={this.state.dateevent} />
-                    
-                    <button type="button" id="send" className="btn btn-default" onClick={ this.newNote.bind(this) } disabled={!this.state.title.length || !this.state.body.length || !this.state.dateevent }> { this.state.edit ? 'Edit Task' : 'Save Task' } </button> 
-                    {this.state.edit ? < button id = "canceledit" className = "btn btn-danger" onClick = { this.reset.bind(this) } > Cancel Edit </button> : ''} 
-                </form> 
-                <div className="panel panel-danger">
+        const inputErrorStyle={borderColor:'red'}
+        return (
+        <div className="App" >
+            <Header  formishidde={this.state.formishidde} showForm={()=>this.showForm()} renderCalendar={(b)=>this.renderCalendar(b)}/>
+                <div className="container">
+                    <FormTasks
+                        ref="FormComponent"
+                        formref={el => this.formRef = el}
+                        newtask={(e)=>this.newTask(e)}
+                        formIsValid={this.state.formIsValid}
+                        onChangeInputs={(e)=>this.onChangeInputs(e)}
+                        datePickerChange={(e)=>this.datePickerChange(e)}
+                        reset={()=>this.reset()}
+                        datetimeOps={this.state.datetimeOps}
+                        dateevent={this.state.dateevent}
+                        title={this.state.title}
+                        body={this.state.body}
+                        edit={this.state.edit}
+                        avislabel={this.state.avislabel}
+                        pruevas={(e)=>this.pruevas(e)}/>
+                        
+                {this.state.renderCalendar ? <Calendar tasks={this.state.tasks}/>:<div className="panel panel-danger">
                     <div className="panel-heading">
-                        <h3 className="panel-title">Notas</h3>
+                        <h3 className="panel-title" style={{textShadow: '-1px -1px 0 rgba(0, 0, 0, 0.3)'}}>Tareas</h3>
                     </div>
                     <div  className="panel-body">
-                        <ListNotes setedit = { this.setedit.bind(this) } scrollToForm={this.scrollToForm.bind(this)}/>
+                        <ListTasks 
+                            tasks={this.state.tasks} 
+                            setedit={ this.setedit.bind(this) } 
+                            showForm={this.showForm.bind(this)} 
+                            showDetails={this.showDetails.bind(this)}/>
                     </div>
-                </div>
-                <ScrollToTop showUnder={160}>
-                    <ButtonUp />
-                 </ScrollToTop>
-                <ModalDialogs show = { this.state.showDialog } close = { this.closeDialog.bind(this) } {...this.state.datadialog }/> </div> 
+                </div> }
+                    <ScrollToTop style={{zIndex:'9999999'}} showUnder={160}>
+                        <ButtonUp />
+                    </ScrollToTop>
+                    <ModalDialogs 
+                        show = { this.state.showDialog } 
+                        close = { this.closeDialog.bind(this) } 
+                        {...this.state.datadialog }/> 
+                </div> 
+                <NotificationContainer/>
+                {this.state.showDetails ? <Details task={this.state.task} close={this.closeDetails.bind(this)}/> : ''}
             </div>
         );
     }

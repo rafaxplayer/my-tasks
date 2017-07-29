@@ -5,7 +5,7 @@
     left: 0;
     right: 0;
     z-index: 999999;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.8);
     padding: 50PX;
     display: flex;
     justify-content: center;
@@ -13,7 +13,7 @@
 }
 
 .window {
-    background-color: #fff;
+   
     border-radius: 5px;
     flex: 0 1 500px;
     max-width: 500px;
@@ -29,11 +29,12 @@
 .window h2 {
     margin: 0;
     padding: 5px 0;
+    color:red;
 }
 
 .window p {
     font-weight: 600;
-    color: #333;
+    color: #b2b2b2;
 }
 
 .window .timer {

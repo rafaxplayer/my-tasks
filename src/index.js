@@ -4,6 +4,7 @@ import firebase from 'firebase';
 import './index.css';
 import App from './components/app/App';
 import registerServiceWorker from './registerServiceWorker';
+import '../node_modules/font-awesome/css/font-awesome.min.css';
 
 var config = {
     apiKey: "AIzaSyAgstyE6l15zTlMxJNJ4xJoJkGII1lwYis",

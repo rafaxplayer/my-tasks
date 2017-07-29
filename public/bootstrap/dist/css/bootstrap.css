@@ -2252,7 +2252,7 @@ pre code {
   }
 }
 table {
-  background-color: #2e3338;
+  background-color: none;
 }
 caption {
   padding-top: 8px;
@@ -2262,6 +2262,13 @@ caption {
 }
 th {
   text-align: left;
+  color:white;
+  background: #670404 ; /* Old browsers */
+  background: -moz-linear-gradient(top, #670404  0%, #cc0000 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, #670404  0%,#cc0000 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, #670404  0%,#cc0000 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#670404 ', endColorstr='#cc0000',GradientType=0 );
+  padding: 10px 0 !important;
 }
 .table {
   width: 100%;
@@ -3524,12 +3531,12 @@ tbody.collapse.in {
   position: absolute;
   top: 100%;
   left: 0;
-  z-index: 1000;
+  z-index: 99999;
   display: none;
   float: left;
   min-width: 160px;
   padding: 5px 0;
-  margin: 2px 0 0;
+  margin: -18px 0 0;
   list-style: none;
   font-size: 14px;
   text-align: left;
@@ -4719,6 +4726,7 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
 }
 .pagination > li {
   display: inline;
+  cursor: pointer;
 }
 .pagination > li > a,
 .pagination > li > span {
@@ -5831,7 +5839,7 @@ button.list-group-item-danger.active:focus {
 }
 .well blockquote {
   border-color: #ddd;
-  border-color: rgba(0, 0, 0, 0.15);
+  border-color: #c10b0b;
 }
 .well-lg {
   padding: 24px;

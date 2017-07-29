@@ -28,9 +28,9 @@ class ModalDialog extends Component {
             return {timertext:prev.timertext-1000}
         });
 
-        console.log(this.state.timertext)
+        
         if(this.state.timertext <= 0){
-            console.log('llega')
+           
             clearInterval(id);
             this.setState({show:false, timer:false, timertext:0})
         }
@@ -42,12 +42,12 @@ class ModalDialog extends Component {
         const{ title, body, confirmText, cancelButton, cancelText, onConfirm} = this.props
         return !this.state.show ? (<div></div>):(
             <div className="modalback">
-                <div className="window">
+                <div className="window well">
                 <h2>{title}</h2>
                 <p>{body}</p>
                 <div className="buttons">
                     {
-                    cancelButton?(<button className="btn btn-btn-danger" onClick={()=>this.props.close()}>{cancelText?cancelText:'Cancel'}</button>):''
+                    cancelButton?(<button className="btn btn-danger" onClick={()=>this.props.close()}>{cancelText?cancelText:'Cancel'}</button>):''
                     }
                     <button className="btn btn-primary" onClick={onConfirm}>
                         {confirmText?confirmText:'Ok'}
@@ -72,5 +72,5 @@ ModalDialog.propTypes = {
   onConfirm :PropTypes.func
 };
 
-export const initialstate = { showDialog:false,datadialog:{title:'Modal Title', body:'Modal Body',confirmText:'Ok',cancelButton:true,cancelText:'Cancel',onConfirm:null,onCancel:null }}
+export const initialDialogstate = { showDialog:false, datadialog:{title:'Modal Title', body:'Modal Body',confirmText:'Ok',cancelButton:true,cancelText:'Cancel',onConfirm:null,onCancel:null }}
 export default ModalDialog;

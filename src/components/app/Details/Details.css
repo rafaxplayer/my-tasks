@@ -1,0 +1,33 @@
+.details{
+    min-width: 380px;
+}
+.well blockquote{
+    margin-left: 7px;
+}
+.progress-timer{
+    display: flex;
+    justify-content: space-around;
+    align-items: center
+}
+
+.CircularProgressbar {
+ 
+  width: 60px;
+}
+
+.CircularProgressbar .CircularProgressbar-path {
+  stroke: #3e98c7;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease 0s;
+}
+
+.CircularProgressbar .CircularProgressbar-trail {
+  stroke: #d6d6d6;
+}
+
+.CircularProgressbar .CircularProgressbar-text {
+  fill: #3e98c7;
+  font-size: 20px;
+  dominant-baseline: middle;
+  text-anchor: middle;
+}

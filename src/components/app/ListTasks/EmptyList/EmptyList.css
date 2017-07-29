@@ -1,0 +1,11 @@
+.empty-list{
+   
+    text-align: center;
+}
+.empty-list span{
+    display: inline-block;
+    
+}
+.empty-list i{
+    font-size: 15em;
+}

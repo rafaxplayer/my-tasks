@@ -1,23 +1,15 @@
+
 .App{
-    
+    /*min-width: 350px;*/
+    box-sizing: border-box;
 }
 
-.App-logo {
-    animation: App-logo-trans 1.5s ease;
-    height: 80px;
-    position: relative;
-    
-}
-
-.App-header {
-    text-align: center;
-    background-color: #1c1e22;
-    padding: 20px;
-    color: white;
-}
 
 .container {
-    margin-top: 20px;
+    margin-top: 50px;
+}
+.container form{
+    display: none;
 }
 .container form button{
     margin:0 10px 20px 0;
@@ -32,6 +24,11 @@
 .panel-danger>.panel-heading{
     background-color: #c10b0b !important;
 }
+.notification-container{
+    top:inherit!important;
+    bottom: 10px !important;
+}
+
 
 @keyframes App-logo-trans {
     0% {
@@ -51,11 +48,34 @@
     }
     
 }
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
+
+@keyframes App-logo-scale {
+    0% {
+        opacity:0;
+        transform:scale(0);
     }
-    to {
-        transform: rotate(360deg);
+    80%{
+        
+        transform:scale(1);
+    }
+    90%{
+        transform:scale(.8);
+    }
+    100%{
+        opacity:1;
+        transform:scale(1);
+    }
+    
+}
+@keyframes movey {
+    0% {
+        top: 32%;
+        opacity: 0;
+    }
+    
+    100% {
+        top:82%;
+        opacity: 1;
     }
 }
+
