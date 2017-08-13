@@ -1,3 +1,8 @@
 .fc-unthemed td.fc-today {
     background: #c56209!important;
 }
+.fc-event{
+    cursor: pointer;
+    padding: 3px !important;
+    margin: 3px 0;
+}

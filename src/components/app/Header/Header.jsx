@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import CalendarIcon from '../../CalendarIcon/CalendraIcon'
+import CalendarLogo from '../../CalendarLogo/CalendarLogo'
 import './Header.css'
 import $ from 'jquery'
 class Header extends Component {
@@ -24,7 +24,7 @@ class Header extends Component {
                 </nav>
                 <div style={{textAlign:'center',position:'relative',marginTop:'20px'}}>
                     <div className ="App-logo" style={{display:'inline-block'}}>
-                        <CalendarIcon/>
+                        <CalendarLogo/>
                     </div>
                 </div>
                 <h1> Welcome to My Tasks App </h1> 

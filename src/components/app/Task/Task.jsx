@@ -10,7 +10,6 @@ class Task extends Component {
         this.state = {
             isFinalize:false,
             countdown:{days:0,hours:0,mins:0,secs:0},
-            countdown2:"",
             task:[]
         }
         this.timerId = null;
@@ -20,7 +19,7 @@ class Task extends Component {
     componentWillReceiveProps(nextProps) {
        
         if(nextProps.task){
-            this.setState({task:nextProps.task,isFinalize:moment(nextProps.task.date_event).isBefore(moment())})
+            this.setState({task:nextProps.task,isFinalize:moment(nextProps.task.start).isBefore(moment())})
             this.startCounter(nextProps.task);
         }
             
@@ -28,7 +27,7 @@ class Task extends Component {
 
     componentWillMount() {
         if(this.props.task){
-            this.setState({task:this.props.task,isFinalize:moment(this.props.task.date_event).isBefore(moment())})
+            this.setState({task:this.props.task,isFinalize:moment(this.props.task.start).isBefore(moment())})
             this.startCounter(this.props.task); 
         }  
     }
@@ -36,13 +35,13 @@ class Task extends Component {
     startCounter(task,isFinalize){
         this.clearCounter();
         this.timerId = setInterval(()=>{
-            const formattedGivenDate = new Date(moment(task.date_event,"YYYY-MM-DD HH:mm:ss Z"))
+            const formattedGivenDate = new Date(moment(task.start,"YYYY-MM-DD HH:mm:ss Z"))
             const today = new Date();
 	        const msDiff = formattedGivenDate - today;
-	        const days = parseInt(msDiff / (24 * 3600 * 1000));
-	        const hours = parseInt(msDiff / (3600 * 1000) - (days * 24));
-	        const mins = parseInt(msDiff / (60 * 1000) - (days * 24 * 60) - (hours * 60));
-	        const secs = parseInt(msDiff / (1000) - (mins * 60) - (days * 24 * 60 * 60) - (hours * 60 * 60));
+	        const days = parseInt(msDiff / (24 * 3600 * 1000),10);
+	        const hours = parseInt(msDiff / (3600 * 1000) - (days * 24),10);
+	        const mins = parseInt(msDiff / (60 * 1000) - (days * 24 * 60) - (hours * 60),10);
+	        const secs = parseInt(msDiff / (1000) - (mins * 60) - (days * 24 * 60 * 60) - (hours * 60 * 60),10);
             this.setState({countdown:{days,hours,mins,secs}})
             if( days === 0 && hours === 0 && mins === 0 && secs === 0 ){
                 this.setState({isFinalize:true})
@@ -50,18 +49,7 @@ class Task extends Component {
             }
         },1000)
         
-        /*this.timerId = countdown(moment(task.date_event,"YYYY-MM-DD HH:mm:ss Z"),(s)=>{
-            const compare = 'Finish';
-            if(s.toString().trim() === compare.toString().trim()){
-                 console.log('finish')
-                 this.clearCounter();
-                this.setState({isFinalize:true,countdown:s.toHTML()})
-                return;
-            }
-        
-        this.setState({countdown2:s.toString()})
-        })*/
-        
+                
         
     }
 
@@ -85,12 +73,12 @@ class Task extends Component {
     }
     render() {
         const { id, remove ,edit } = this.props;
-        const { task, countdown,countdown2, isFinalize } = this.state;
+        const { task, countdown,isFinalize } = this.state;
         return(
             <div className="well">
                 <div className="tools">
-                    <i className="fa fa-info-circle" aria-hidden="true" onClick={this.showDetails.bind(this)}></i>
-                    <i className="fa fa-times" aria-hidden="true" onClick={ remove.bind(this,id) }></i>
+                    <i className="fa fa-info-circle" aria-hidden="true" onClick={()=>this.showDetails()}></i>
+                    <i className="fa fa-times" aria-hidden="true" onClick={ ()=>remove(id) }></i>
                     <i className="fa fa-pencil" aria-hidden="true" onClick={()=> edit(id,task)}></i>
                     
                 </div>
@@ -98,7 +86,7 @@ class Task extends Component {
                 <p><strong>Titulo :</strong> { task.title }</p>
                 <p><strong>Comentario :</strong> { task.body }</p>
                 <p><strong>Creado :</strong> { moment(task.creation_date).format('DD/MM/YYYY HH:mm:ss za') }</p>
-                <p><strong>Fecha del evento :</strong> { moment(task.date_event).format('DD/MM/YYYY HH:mm:ss za') }</p>
+                <p><strong>Fecha del evento :</strong> { moment(task.start).format('DD/MM/YYYY HH:mm:ss za') }</p>
                 <p><strong>Fecha de Notificación :</strong> { moment(task.date_notify).format('DD/MM/YYYY HH:mm:ss za') }</p>
                 {isFinalize ? "" : 
                 <div className="counttime">

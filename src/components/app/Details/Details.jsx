@@ -4,7 +4,7 @@ import './Details.css'
 import CircularProgressbar from 'react-circular-progressbar';
 class Details extends Component {
     
-    state = { task:this.props.task,isFinalize:moment(this.props.task.date_event).isBefore(moment()),countdown:{days:0,hours:0,mins:0,secs:0} }
+    state = { task:this.props.task,isFinalize:moment(this.props.task.start).isBefore(moment()),countdown:{days:0,hours:0,mins:0,secs:0} }
     timerId = null;
 
     componentWillMount() {
@@ -22,13 +22,13 @@ class Details extends Component {
         this.clearCounter();
                 
         this.timerId = setInterval(()=>{
-            const formattedGivenDate = new Date(moment(task.date_event,"YYYY-MM-DD HH:mm:ss Z"))
+            const formattedGivenDate = new Date(moment(task.start,"YYYY-MM-DD HH:mm:ss Z"))
             const today = new Date();
 	        const msDiff = formattedGivenDate - today;
-	        const days = parseInt(msDiff / (24 * 3600 * 1000));
-	        const hours = parseInt(msDiff / (3600 * 1000) - (days * 24));
-	        const mins = parseInt(msDiff / (60 * 1000) - (days * 24 * 60) - (hours * 60));
-	        const secs = parseInt(msDiff / (1000) - (mins * 60) - (days * 24 * 60 * 60) - (hours * 60 * 60));
+	        const days = parseInt(msDiff / (24 * 3600 * 1000),10);
+	        const hours = parseInt(msDiff / (3600 * 1000) - (days * 24),10);
+	        const mins = parseInt(msDiff / (60 * 1000) - (days * 24 * 60) - (hours * 60),10);
+	        const secs = parseInt(msDiff / (1000) - (mins * 60) - (days * 24 * 60 * 60) - (hours * 60 * 60),10);
             this.setState({countdown:{days,hours,mins,secs}})
             if( days === 0 && hours === 0 && mins === 0 && secs === 0 ){
                 this.setState({isFinalize:true})

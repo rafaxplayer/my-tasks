@@ -14,7 +14,6 @@ import Header from './Header/Header'
 import FormTasks from './FormTasks/FormTasks'
 import _ from 'lodash'
 import { NotificationContainer, NotificationManager } from 'react-notifications'
-import CalendarIcon from '../CalendarIcon/CalendraIcon'
 import $ from 'jquery'
 import scrollTo from 'jquery.scrollto'
 
@@ -35,20 +34,15 @@ class App extends Component {
         showDetails:false,
         task:null,
         tasks:[],
-        renderCalendar:true,
+        renderCalendar:false,
         initialDialogstate
     }
   
-    messagesRef = firebase.database().ref('/notas')
+    messagesRef = firebase.database().ref('/tasks')
     interval = null;
     
     componentWillMount(){
-               
-        firebase.database().ref('/notas').orderByChild('date_event').on('value',(snapshot)=>{
-            this.setState({tasks:snapshot.val()})
-        })
-       
-       
+     
         $(".dropdown-menu li a").on('click', (e) => {
             e.preventDefault();
             let selText = e.currentTarget.innerHTML;
@@ -66,11 +60,12 @@ class App extends Component {
         })
 
         this.interval = setInterval(() => {
-            firebase.database().ref('/notas').once('value',(snapshot) => {
+            firebase.database().ref('/tasks').once('value',(snapshot) => {
                 snapshot.forEach((snap) => {
                     if(moment(moment()).isAfter(snap.val().date_notify)&& !snap.val().notify){
                         NotificationManager.success(snap.val().body, snap.val().title, 0, null, false);
-                        firebase.database().ref('/notas').child(snap.key).update({notify:true})
+                        new Audio('audio/notification.mp3').play();
+                        firebase.database().ref('/tasks').child(snap.key).update({notify:true})
                     }
                 })
             })
@@ -114,11 +109,11 @@ class App extends Component {
     }
 
     showDetails(task){
-        this.setState({task:task,showDetails:true})
+        this.setState({task:task, showDetails:true})
     }
    
-    setedit(id, note) {
-        const data = {  title: note.title, body: note.body, key: id, dateevent:moment(note.date_event),datenotify:moment(note.date_notify), edit: true }
+    setedit(id, task) {
+        const data = { title: task.title, body: task.body, key: id, dateevent:moment(task.start),datenotify:moment(task.date_notify), edit: true }
         this.setState(data);
         if(this.state.formishidde){
             this.showForm();
@@ -126,9 +121,14 @@ class App extends Component {
         this.scrollToForm();
             
     }
+
     renderCalendar(bool){
+        if($('.container form').is(':visible')){
+            this.showForm();
+        }
         this.setState({renderCalendar:bool})
     }
+
     closeDialog() {
         this.setState(initialDialogstate)
     }
@@ -152,12 +152,13 @@ class App extends Component {
             title: this.state.title, 
             body: this.state.body, 
             creation_date:moment().format(),
-            date_event: moment(this.state.dateevent).format(),
+            start: moment(this.state.dateevent).format(),
+            /* end: moment(this.state.dateevent).format(), */
             date_notify: this.state.key.length > 0 ? moment(this.state.datenotify).format():moment(this.state.datenotify).subtract(this.state.avismodify.n,this.state.avismodify.f).format(),
             notify:false
         }
         
-        const tasksRef = firebase.database().ref('/notas')
+        const tasksRef = firebase.database().ref('/tasks')
         const key = this.state.key.length > 0 ? this.state.key : tasksRef.push().key;
 
         tasksRef.child(key).update(data)
@@ -186,10 +187,13 @@ class App extends Component {
     showCalendar(){
         this.setState({showcalendar:!this.state.showcalendar});
     }
-
+    
     pruevas = (e) => {
         e.preventDefault();
         
+       
+       new Audio('audio/notification.mp3').play()
+       
     }
 
     componentWillUnmount() {
@@ -197,7 +201,7 @@ class App extends Component {
     }
 
     render() {
-        const inputErrorStyle={borderColor:'red'}
+        
         return (
         <div className="App" >
             <Header  formishidde={this.state.formishidde} showForm={()=>this.showForm()} renderCalendar={(b)=>this.renderCalendar(b)}/>
@@ -218,16 +222,15 @@ class App extends Component {
                         avislabel={this.state.avislabel}
                         pruevas={(e)=>this.pruevas(e)}/>
                         
-                {this.state.renderCalendar ? <Calendar tasks={this.state.tasks}/>:<div className="panel panel-danger">
+                {this.state.renderCalendar ? <Calendar showDetails={(t)=>this.showDetails(t)}/>:<div className="panel panel-danger">
                     <div className="panel-heading">
                         <h3 className="panel-title" style={{textShadow: '-1px -1px 0 rgba(0, 0, 0, 0.3)'}}>Tareas</h3>
                     </div>
                     <div  className="panel-body">
                         <ListTasks 
-                            tasks={this.state.tasks} 
-                            setedit={ this.setedit.bind(this) } 
-                            showForm={this.showForm.bind(this)} 
-                            showDetails={this.showDetails.bind(this)}/>
+                            setedit={()=> this.setedit() } 
+                            showForm={()=>this.showForm()} 
+                            showDetails={(task)=>this.showDetails(task)}/>
                     </div>
                 </div> }
                     <ScrollToTop style={{zIndex:'9999999'}} showUnder={160}>

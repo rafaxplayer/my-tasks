@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './CalendarIcon.css'
+import './CalendarLogo.css'
 import moment from 'moment'
 class CalendarIcon extends Component {
     constructor(props){
